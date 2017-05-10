@@ -48,6 +48,14 @@ open class TagListView: UIView {
         }
     }
     
+    open var tagHighlightedBackground: UIView? {
+        didSet {
+            for tagView in tagViews {
+                tagView.highlightedBackground = tagHighlightedBackground?.copyView()
+            }
+        }
+    }
+    
     @IBInspectable open dynamic var tagSelectedBackgroundColor: UIColor? {
         didSet {
             for tagView in tagViews {
@@ -83,6 +91,14 @@ open class TagListView: UIView {
         didSet {
             for tagView in tagViews {
                 tagView.selectedBorderColor = selectedBorderColor
+            }
+        }
+    }
+    
+    open var tagSelectedBackground: UIView? {
+        didSet {
+            for tagView in tagViews {
+                tagView.selectedBackground = tagSelectedBackground?.copyView()
             }
         }
     }
@@ -290,7 +306,9 @@ open class TagListView: UIView {
         tagView.selectedTextColor = selectedTextColor
         tagView.tagBackgroundColor = tagBackgroundColor
         tagView.highlightedBackgroundColor = tagHighlightedBackgroundColor
+        tagView.highlightedBackground = tagHighlightedBackground?.copyView()
         tagView.selectedBackgroundColor = tagSelectedBackgroundColor
+        tagView.selectedBackground = tagSelectedBackground?.copyView()
         tagView.cornerRadius = cornerRadius
         tagView.borderWidth = borderWidth
         tagView.borderColor = borderColor

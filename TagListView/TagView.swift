@@ -64,6 +64,14 @@ open class TagView: UIButton {
         }
     }
     
+    open var highlightedBackground: UIView? {
+        didSet {
+            highlightedBackground?.isUserInteractionEnabled = false
+            highlightedBackground?.translatesAutoresizingMaskIntoConstraints = true
+            reloadStyles()
+        }
+    }
+    
     @IBInspectable open var selectedBorderColor: UIColor? {
         didSet {
             reloadStyles()
@@ -76,6 +84,14 @@ open class TagView: UIButton {
         }
     }
     
+    open var selectedBackground: UIView? {
+        didSet {
+            selectedBackground?.isUserInteractionEnabled = false
+            selectedBackground?.translatesAutoresizingMaskIntoConstraints = true
+            reloadStyles()
+        }
+    }
+    
     var textFont: UIFont = UIFont.systemFont(ofSize: 12) {
         didSet {
             titleLabel?.font = textFont
@@ -83,12 +99,25 @@ open class TagView: UIButton {
     }
     
     private func reloadStyles() {
-        if isHighlighted {
+        highlightedBackground?.removeFromSuperview()
+        selectedBackground?.removeFromSuperview()
+        
+        if let background = highlightedBackground,
+            isHighlighted {
+            background.frame = bounds
+            insertSubview(background, at: 0)
+        }
+        else if isHighlighted {
             if let highlightedBackgroundColor = highlightedBackgroundColor {
                 // For highlighted, if it's nil, we should not fallback to backgroundColor.
                 // Instead, we keep the current color.
                 backgroundColor = highlightedBackgroundColor
             }
+        }
+        else if let background = selectedBackground,
+            isSelected {
+            background.frame = bounds
+            insertSubview(background, at: 0)
         }
         else if isSelected {
             backgroundColor = selectedBackgroundColor ?? tagBackgroundColor
