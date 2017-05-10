@@ -102,27 +102,25 @@ open class TagView: UIButton {
         highlightedBackground?.removeFromSuperview()
         selectedBackground?.removeFromSuperview()
         
-        if let background = highlightedBackground,
-            isHighlighted {
-            background.frame = bounds
-            insertSubview(background, at: 0)
-        }
-        else if isHighlighted {
+        if isHighlighted {
             if let highlightedBackgroundColor = highlightedBackgroundColor {
                 // For highlighted, if it's nil, we should not fallback to backgroundColor.
                 // Instead, we keep the current color.
                 backgroundColor = highlightedBackgroundColor
             }
-        }
-        else if let background = selectedBackground,
-            isSelected {
-            background.frame = bounds
-            insertSubview(background, at: 0)
+            if let background = highlightedBackground {
+                background.frame = bounds
+                insertSubview(background, at: 0)
+            }
         }
         else if isSelected {
             backgroundColor = selectedBackgroundColor ?? tagBackgroundColor
             layer.borderColor = selectedBorderColor?.cgColor ?? borderColor?.cgColor
             setTitleColor(selectedTextColor, for: UIControlState())
+            if let background = selectedBackground {
+                background.frame = bounds
+                insertSubview(background, at: 0)
+            }
         }
         else {
             backgroundColor = tagBackgroundColor

@@ -95,6 +95,20 @@ open class TagListView: UIView {
         }
     }
     
+    /// Selected backgrounds producer. User for complex views
+    open var tagSelectedBackgroundProducer: (CGSize) -> UIView? = { _ in return nil } {
+        didSet {
+            for tagView in tagViews {
+                tagView.selectedBackground = tagSelectedBackgroundProducer(tagView.bounds.size)
+            }
+        }
+    }
+    
+    /// This view will replace other selection properties if set.
+    ///
+    /// This properties captures only simple views.
+    /// If you want to set complex view hierarchy as background – use 
+    /// `open var tagSelectedBackgroundProducer: () -> UIView`
     open var tagSelectedBackground: UIView? {
         didSet {
             for tagView in tagViews {
@@ -308,7 +322,7 @@ open class TagListView: UIView {
         tagView.highlightedBackgroundColor = tagHighlightedBackgroundColor
         tagView.highlightedBackground = tagHighlightedBackground?.copyView()
         tagView.selectedBackgroundColor = tagSelectedBackgroundColor
-        tagView.selectedBackground = tagSelectedBackground?.copyView()
+        tagView.selectedBackground = tagSelectedBackgroundProducer(tagView.systemLayoutSizeFitting(UILayoutFittingCompressedSize)) ?? tagSelectedBackground?.copyView()
         tagView.cornerRadius = cornerRadius
         tagView.borderWidth = borderWidth
         tagView.borderColor = borderColor
