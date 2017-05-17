@@ -84,13 +84,27 @@ open class TagView: UIButton {
         }
     }
     
-    open var selectedBackground: UIView? {
+    open var selectedBackgroundProducer: ((CGSize) -> UIView?)? {
         didSet {
-            selectedBackground?.isUserInteractionEnabled = false
-            selectedBackground?.translatesAutoresizingMaskIntoConstraints = true
             reloadStyles()
         }
     }
+    
+    private var selectedBackground: UIView? {
+        set {
+            _selectedBackground?.removeFromSuperview()
+            _selectedBackground = newValue
+        }
+        get {
+            _selectedBackground?.removeFromSuperview()
+            _selectedBackground = selectedBackgroundProducer?(bounds.size)
+            _selectedBackground?.isUserInteractionEnabled = false
+            _selectedBackground?.translatesAutoresizingMaskIntoConstraints = true
+            return _selectedBackground
+        }
+    }
+    
+    private var _selectedBackground: UIView?
     
     var textFont: UIFont = UIFont.systemFont(ofSize: 12) {
         didSet {
@@ -98,7 +112,7 @@ open class TagView: UIButton {
         }
     }
     
-    private func reloadStyles() {
+    open func reloadStyles() {
         highlightedBackground?.removeFromSuperview()
         selectedBackground?.removeFromSuperview()
         
@@ -182,7 +196,7 @@ open class TagView: UIButton {
         setupView()
     }
     
-    public init(title: String) {
+    required public init(title: String) {
         super.init(frame: CGRect.zero)
         setTitle(title, for: UIControlState())
         

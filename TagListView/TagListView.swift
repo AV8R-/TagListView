@@ -99,20 +99,7 @@ open class TagListView: UIView {
     open var tagSelectedBackgroundProducer: (CGSize) -> UIView? = { _ in return nil } {
         didSet {
             for tagView in tagViews {
-                tagView.selectedBackground = tagSelectedBackgroundProducer(tagView.bounds.size)
-            }
-        }
-    }
-    
-    /// This view will replace other selection properties if set.
-    ///
-    /// This properties captures only simple views.
-    /// If you want to set complex view hierarchy as background – use 
-    /// `open var tagSelectedBackgroundProducer: () -> UIView`
-    open var tagSelectedBackground: UIView? {
-        didSet {
-            for tagView in tagViews {
-                tagView.selectedBackground = tagSelectedBackground?.copyView()
+                tagView.selectedBackgroundProducer = tagSelectedBackgroundProducer
             }
         }
     }
@@ -313,8 +300,8 @@ open class TagListView: UIView {
         return CGSize(width: frame.width, height: height)
     }
     
-    private func createNewTagView(_ title: String) -> TagView {
-        let tagView = TagView(title: title)
+    private func createNewTagView<TagClass: TagView>(_ title: String) -> TagClass {
+        let tagView = TagClass(title: title)
         
         tagView.textColor = textColor
         tagView.selectedTextColor = selectedTextColor
@@ -322,7 +309,6 @@ open class TagListView: UIView {
         tagView.highlightedBackgroundColor = tagHighlightedBackgroundColor
         tagView.highlightedBackground = tagHighlightedBackground?.copyView()
         tagView.selectedBackgroundColor = tagSelectedBackgroundColor
-        tagView.selectedBackground = tagSelectedBackgroundProducer(tagView.systemLayoutSizeFitting(UILayoutFittingCompressedSize)) ?? tagSelectedBackground?.copyView()
         tagView.cornerRadius = cornerRadius
         tagView.borderWidth = borderWidth
         tagView.borderColor = borderColor
@@ -337,6 +323,8 @@ open class TagListView: UIView {
         tagView.addTarget(self, action: #selector(tagPressed(_:)), for: .touchUpInside)
         tagView.removeButton.addTarget(self, action: #selector(removeButtonPressed(_:)), for: .touchUpInside)
         
+        tagView.selectedBackgroundProducer = tagSelectedBackgroundProducer
+        
         // On long press, deselect all tags except this one
         tagView.onLongPress = { [unowned self] this in
             for tag in self.tagViews {
@@ -348,13 +336,13 @@ open class TagListView: UIView {
     }
 
     @discardableResult
-    open func addTag(_ title: String) -> TagView {
+    open func addTag<TagClass: TagView>(_ title: String) -> TagClass {
         return addTagView(createNewTagView(title))
     }
     
     @discardableResult
-    open func addTags(_ titles: [String]) -> [TagView] {
-        var tagViews: [TagView] = []
+    open func addTags<TagClass: TagView>(_ titles: [String]) -> [TagClass] {
+        var tagViews: [TagClass] = []
         for title in titles {
             tagViews.append(createNewTagView(title))
         }
@@ -362,7 +350,7 @@ open class TagListView: UIView {
     }
     
     @discardableResult
-    open func addTagViews(_ tagViews: [TagView]) -> [TagView] {
+    open func addTagViews<TagClass: TagView>(_ tagViews: [TagClass]) -> [TagClass] {
         for tagView in tagViews {
             self.tagViews.append(tagView)
             tagBackgroundViews.append(UIView(frame: tagView.bounds))
@@ -372,12 +360,12 @@ open class TagListView: UIView {
     }
 
     @discardableResult
-    open func insertTag(_ title: String, at index: Int) -> TagView {
+    open func insertTag<TagClass: TagView>(_ title: String, at index: Int) -> TagClass {
         return insertTagView(createNewTagView(title), at: index)
     }
     
     @discardableResult
-    open func addTagView(_ tagView: TagView) -> TagView {
+    open func addTagView<TagClass: TagView>(_ tagView: TagClass) -> TagClass {
         tagViews.append(tagView)
         tagBackgroundViews.append(UIView(frame: tagView.bounds))
         rearrangeViews()
@@ -386,7 +374,7 @@ open class TagListView: UIView {
     }
 
     @discardableResult
-    open func insertTagView(_ tagView: TagView, at index: Int) -> TagView {
+    open func insertTagView<TagClass: TagView>(_ tagView: TagClass, at index: Int) -> TagClass {
         tagViews.insert(tagView, at: index)
         tagBackgroundViews.insert(UIView(frame: tagView.bounds), at: index)
         rearrangeViews()
