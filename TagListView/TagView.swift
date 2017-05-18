@@ -114,7 +114,6 @@ open class TagView: UIButton {
     
     open func reloadStyles() {
         highlightedBackground?.removeFromSuperview()
-        selectedBackground?.removeFromSuperview()
         
         if isHighlighted {
             if let highlightedBackgroundColor = highlightedBackgroundColor {
@@ -137,6 +136,7 @@ open class TagView: UIButton {
             }
         }
         else {
+            selectedBackground?.removeFromSuperview()
             backgroundColor = tagBackgroundColor
             layer.borderColor = borderColor?.cgColor
             setTitleColor(textColor, for: UIControlState())
